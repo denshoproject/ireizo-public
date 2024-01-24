@@ -1,11 +1,8 @@
 # Third-party libs and Django apps used by namesdbsite
 
                                    # LICENSE
-django>=4.1.0,<4.2                 # MIT
-django-bootstrap-pagination-forked # MIT      ???     TODO replace
-djangorestframework>=3.13.0,<3.14  # BSD      y
-drf-yasg>=1.21.0,<1.22             # BSD      y
-gunicorn                           # MIT
-httpx
+django>=4.2.0,<4.3
+djangorestframework>=3.13.0,<3.14
+drf-yasg>=1.21.0,<1.22
 
 git+https://github.com/denshoproject/densho-elastictools.git@v1.0.2
