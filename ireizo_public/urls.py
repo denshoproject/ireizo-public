@@ -33,9 +33,8 @@ urlpatterns = [
     path('api/redoc/',
          schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'
     ),
-    
     re_path(
-        r'^api/1.0/ireirecords/(?P<object_id>[0-9a-zA-Z_:-]+)',
+        r'^api/1.0/(?P<object_id>[0-9a-zA-Z_:-]+)',
         api.ireirecord, name='ireizo-api-ireirecord'
     ),
     path('api/1.0/', api.index, name='ireizo-api-index'),

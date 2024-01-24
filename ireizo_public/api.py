@@ -24,9 +24,7 @@ DEFAULT_LIMIT = 25
 def index(request, format=None):
     """Swagger UI: /api/swagger/
     """
-    data = {
-        'ireirecords': reverse('ireizo-api-ireirecords', request=request),
-    }
+    data = {}
     return Response(data)
 
 
