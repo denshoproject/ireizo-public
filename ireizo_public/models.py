@@ -236,6 +236,10 @@ AGG_FIELDS_IREIRECORD = {}
 
 HIGHLIGHT_FIELDS_IREIRECORD = []
 
+class NestedPerson(dsl.InnerDoc):
+    nr_id = dsl.Keyword()
+    preferred_name = dsl.Text()
+
 class IreiRecord(Record):
     """IreiRecord model
     """
