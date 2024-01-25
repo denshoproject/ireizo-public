@@ -28,13 +28,19 @@ def index(request, format=None):
     return Response(data)
 
 
-def _detail(request, data):
-    """Common function for detail views.
-    """
-    if not data:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(data)
-
 @api_view(['GET'])
 def ireirecord(request, object_id, format=None):
-    return _detail(request, models.IreiRecord.get(object_id, request))
+    try:
+        record = models.IreiRecord.get(object_id, request)
+        if record['person'] and record['person']['nr_id']:
+            return Response(record)
+    except docstore.NotFoundError:
+        return Response(
+            {'irei_id not found': object_id},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except KeyError:
+        return Response(
+            {'irei record has no person': object_id},
+            status=status.HTTP_204_NO_CONTENT
+        )
