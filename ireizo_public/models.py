@@ -18,7 +18,7 @@ from elastictools.docstore import elasticsearch_dsl as dsl
 
 from . import definitions
 
-INDEX_PREFIX = 'ireizo'
+INDEX_PREFIX = 'names'
 
 MAX_SIZE = 1000
 
@@ -396,5 +396,5 @@ def join_highlight_text(model, highlights):
     return ', '.join(snippets)
 
 FORMATTERS = {
-    'ireizoireirecord': format_ireirecord,
+    'namesireirecord': format_ireirecord,
 }
