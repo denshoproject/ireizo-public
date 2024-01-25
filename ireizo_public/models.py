@@ -347,7 +347,7 @@ def format_object_detail(document, request, listitem=False):
         model = model.replace(INDEX_PREFIX, '')
     
     d = OrderedDict()
-    d['id'] = oid
+    d['irei_id'] = oid
     d['model'] = model
     if document.get('index'):
         d['index'] = document.pop('index')
@@ -358,11 +358,17 @@ def format_object_detail(document, request, listitem=False):
         d['links']['json'] = reverse('ireizo-api-ireirecord', args=[oid], request=request)
     d['title'] = ''
     d['description'] = ''
-    
     for field in FIELDS_BY_MODEL[model]:
         if document.get(field):
-            d[field] = document[field]
-    
+            data = document[field]
+            # for some reason person ID is 'id' and not 'nr_id'
+            if field == 'person':
+                person = {
+                    'nr_id': data.pop('id'),
+                    'name': data.pop('name'),
+                }
+                data = person
+            d[field] = data
     return d
 
 def format_ireirecord(document, request, highlights=None, listitem=False):
