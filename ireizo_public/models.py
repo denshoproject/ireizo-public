@@ -354,7 +354,7 @@ def format_object_detail(document, request, listitem=False):
     d['links'] = OrderedDict()
     # accomodate ark/noids
     if model == 'ireirecord':
-        d['links']['html'] = reverse('ireizo-ireirecord', args=[oid], request=request)
+        #d['links']['html'] = reverse('ireizo-ireirecord', args=[oid], request=request)
         d['links']['json'] = reverse('ireizo-api-ireirecord', args=[oid], request=request)
     d['title'] = ''
     d['description'] = ''
@@ -374,8 +374,8 @@ def format_ireirecord(document, request, highlights=None, listitem=False):
     if document.get('index'):
         d['index'] = document.pop('index')
     d['links'] = OrderedDict()
-    d['links']['html'] = reverse('ireipub-ireirecord', args=[oid], request=request)
-    d['links']['json'] = reverse('ireipub-api-ireirecord', args=[oid], request=request)
+    #d['links']['html'] = reverse('ireizo-ireirecord', args=[oid], request=request)
+    d['links']['json'] = reverse('ireizo-api-ireirecord', args=[oid], request=request)
     d['title'] = ''
     d['description'] = ''
     for field in FIELDS_BY_MODEL[model]:
