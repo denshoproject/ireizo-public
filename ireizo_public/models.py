@@ -10,6 +10,7 @@ import sys
 logging.getLogger("elasticsearch").setLevel(logging.WARNING)
 
 from django.conf import settings
+import httpx
 from rest_framework.exceptions import NotFound
 from rest_framework.reverse import reverse
 
@@ -356,8 +357,8 @@ def format_object_detail(document, request, listitem=False):
     if model == 'ireirecord':
         #d['links']['html'] = reverse('ireizo-ireirecord', args=[oid], request=request)
         d['links']['json'] = reverse('ireizo-api-ireirecord', args=[oid], request=request)
-    d['title'] = ''
-    d['description'] = ''
+    #d['title'] = ''
+    #d['description'] = ''
     for field in FIELDS_BY_MODEL[model]:
         if document.get(field):
             data = document[field]
@@ -369,6 +370,7 @@ def format_object_detail(document, request, listitem=False):
                 }
                 data = person
             d[field] = data
+    d['ddr_objects'] = []
     return d
 
 def format_ireirecord(document, request, highlights=None, listitem=False):
@@ -404,3 +406,26 @@ def join_highlight_text(model, highlights):
 FORMATTERS = {
     'namesireirecord': format_ireirecord,
 }
+
+def ddr_objects(nr_id, request):
+    """Get DDR objects for Person"""
+    naan,noid = nr_id.split('/')
+    # TODO cache this
+    ui_url = f"{settings.DDR_UI_URL}/nrid/{naan}/{noid}/"
+    api_url = f"{settings.DDR_API_URL}/api/0.2/nrid/{naan}/{noid}/"
+    if settings.DDR_API_USERNAME and settings.DDR_API_PASSWORD:
+        r = httpx.get(
+            api_url, timeout=settings.DDR_API_TIMEOUT,
+            auth=(settings.DDR_API_USERNAME, settings.DDR_API_PASSWORD),
+            follow_redirects=True
+        )
+    else:
+        r = httpx.get(
+            api_url, timeout=settings.DDR_API_TIMEOUT,
+            follow_redirects=True
+        )
+    if r.status_code == HTTPStatus.OK:
+        data = r.json()
+        if data.get('objects') and len(data['objects']):
+            return ui_url,api_url,r.status_code,data['objects']
+    return ui_url,api_url,r.status_code,[]

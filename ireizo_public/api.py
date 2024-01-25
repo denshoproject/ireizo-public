@@ -33,10 +33,19 @@ def ireirecord(request, object_id, format=None):
     try:
         record = models.IreiRecord.get(object_id, request)
         if record['person'] and record['person']['nr_id']:
-            return Response(record)
+            nr_id = record['person']['nr_id']
+            ddr_response = models.ddr_objects(nr_id, request)
+            ddr_ui_url,ddr_api_url,ddr_status,ddrobjects = ddr_response
+            if ddrobjects:
+                record['ddr_objects'] = ddrobjects[:5]
+                return Response(record)
+            return Response(
+                {'irei record has no ddr objects': object_id},
+                status=status.HTTP_204_NO_CONTENT
+            )
     except docstore.NotFoundError:
         return Response(
-            {'irei_id not found': object_id},
+            {'irei record not found': object_id},
             status=status.HTTP_404_NOT_FOUND
         )
     except KeyError:
