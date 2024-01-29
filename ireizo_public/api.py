@@ -36,6 +36,10 @@ def ireirecord(request, object_id, format=None):
             nr_id = record['person']['nr_id']
             ddr_response = models.ddr_objects(nr_id, request)
             ddr_ui_url,ddr_api_url,ddr_status,ddrobjects = ddr_response
+            if not status.is_success(ddr_status):
+                return Response(
+                    {'Internal query HTTP status': ddr_status}, status=ddr_status
+                )
             if ddrobjects:
                 record['ddr_objects'] = ddrobjects[:5]
                 return Response(record)
