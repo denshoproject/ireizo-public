@@ -41,7 +41,17 @@ def ireirecord(request, object_id, format=None):
                     {'Internal query HTTP status': ddr_status}, status=ddr_status
                 )
             if ddrobjects:
+                # trim extra fields
+                ALLOWED_FIELDS_PERSON = ['irei_id','person','links','name','birthday',]
+                ALLOWED_FIELDS_OBJECTS = ['id','links','title','credit',]
+                for fieldname in [f for f in record.keys()]:
+                    if fieldname not in ALLOWED_FIELDS_PERSON:
+                        record.pop(fieldname)
                 record['ddr_objects'] = ddrobjects[:5]
+                for rowd in ddrobjects:
+                    for fieldname in [f for f in rowd.keys()]:
+                        if fieldname not in ALLOWED_FIELDS_OBJECTS:
+                            rowd.pop(fieldname)
                 return Response(record)
             return Response(
                 {'irei record has no ddr objects': object_id},
