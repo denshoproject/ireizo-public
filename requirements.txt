@@ -5,3 +5,4 @@
 #djangorestframework
 #drf-yasg
 #git+https://github.com/denshoproject/densho-elastictools.git
+httpx
