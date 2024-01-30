@@ -1,8 +1,7 @@
 # Third-party libs and Django apps used by namesdbsite
 
                                    # LICENSE
-django>=4.2.0,<4.3
-djangorestframework>=3.13.0,<3.14
-drf-yasg>=1.21.0,<1.22
-
-git+https://github.com/denshoproject/densho-elastictools.git@v1.0.2
+#django
+#djangorestframework
+#drf-yasg
+#git+https://github.com/denshoproject/densho-elastictools.git
