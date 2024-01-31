@@ -30,6 +30,8 @@ def index(request, format=None):
 
 @api_view(['GET'])
 def ireirecord(request, object_id, format=None):
+    """Returns list of DDR objects for the Person matching an Irei ID
+    """
     try:
         record = models.IreiRecord.get(object_id, request)
         if record['person'] and record['person']['nr_id']:
@@ -41,18 +43,27 @@ def ireirecord(request, object_id, format=None):
                     {'Internal query HTTP status': ddr_status}, status=ddr_status
                 )
             if ddrobjects:
-                # trim extra fields
-                ALLOWED_FIELDS_PERSON = ['irei_id','person','links','name','birthday',]
-                ALLOWED_FIELDS_OBJECTS = ['id','links','title','credit',]
-                for fieldname in [f for f in record.keys()]:
-                    if fieldname not in ALLOWED_FIELDS_PERSON:
-                        record.pop(fieldname)
-                record['ddr_objects'] = ddrobjects[:5]
-                for rowd in ddrobjects:
+                # assemble output
+                ALLOW_FIELDS_OBJECTS = ['id','links','title','format', 'credit']
+                ALLOW_FIELDS_LINKS = ['html','json','img',]
+                api_out = {
+                    'irei_id': object_id,
+                    'nr_id': nr_id,
+                    'name': record['name'],
+                    'objects': [],
+                }
+                for rowd in ddrobjects[:5]:
                     for fieldname in [f for f in rowd.keys()]:
-                        if fieldname not in ALLOWED_FIELDS_OBJECTS:
+                        if fieldname not in ALLOW_FIELDS_OBJECTS:
                             rowd.pop(fieldname)
-                return Response(record)
+                    for fieldname in [f for f in rowd['links'].keys()]:
+                        if fieldname not in ALLOW_FIELDS_LINKS:
+                            rowd['links'].pop(fieldname)
+                    api_out['objects'].append(rowd)
+                return Response(
+                    api_out,
+                    status=status.HTTP_200_OK
+                )
             return Response(
                 {'irei record has no ddr objects': object_id},
                 status=status.HTTP_204_NO_CONTENT
