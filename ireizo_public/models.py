@@ -407,6 +407,38 @@ FORMATTERS = {
     'namesireirecord': format_ireirecord,
 }
 
+class PersonNotFoundError(Exception):
+    pass
+
+def irei_person_objects(request, irei_id):
+    """Get DDR objects for the Person matching an irei_id"""
+    irei_record = IreiRecord.get(irei_id, request)
+    try:
+        nr_id = irei_record['person']['nr_id']
+    except KeyError:
+        raise PersonNotFoundError()
+    # get data from DDR API
+    ddr_response = ddr_objects(nr_id, request)
+    ddr_ui_url,ddr_api_url,ddr_status,ddrobjects = ddr_response
+    # assemble output
+    api_out = {
+        'irei_id': irei_id,
+        'nr_id': nr_id,
+        'name': irei_record['name'],
+        'objects': [],
+    }
+    ALLOW_FIELDS_OBJECTS = ['id','links','title','format', 'credit']
+    ALLOW_FIELDS_LINKS = ['html','json','img',]
+    for rowd in ddrobjects[:5]:
+        for fieldname in [f for f in rowd.keys()]:
+            if fieldname not in ALLOW_FIELDS_OBJECTS:
+                rowd.pop(fieldname)
+        for fieldname in [f for f in rowd['links'].keys()]:
+            if fieldname not in ALLOW_FIELDS_LINKS:
+                rowd['links'].pop(fieldname)
+        api_out['objects'].append(rowd)
+    return ddr_status,api_out
+
 def ddr_objects(nr_id, request):
     """Get DDR objects for Person"""
     naan,noid = nr_id.split('/')
