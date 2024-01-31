@@ -444,7 +444,7 @@ def ddr_objects(nr_id, request):
     naan,noid = nr_id.split('/')
     # TODO cache this
     ui_url = f"{settings.DDR_UI_URL}/nrid/{naan}/{noid}/"
-    api_url = f"{settings.DDR_API_URL}/api/0.2/nrid/{naan}/{noid}/"
+    api_url = f"{settings.DDR_API_URL}/api/0.2/nrid/{naan}/{noid}/?irei=true"
     if settings.DDR_API_USERNAME and settings.DDR_API_PASSWORD:
         r = httpx.get(
             api_url, timeout=settings.DDR_API_TIMEOUT,
