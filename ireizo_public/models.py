@@ -6,6 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 import os
 import sys
+from urllib.parse import urlparse, urlunparse
 
 logging.getLogger("elasticsearch").setLevel(logging.WARNING)
 
@@ -430,12 +431,22 @@ def irei_person_objects(request, irei_id):
     ALLOW_FIELDS_OBJECTS = ['id','links','title','format', 'credit']
     ALLOW_FIELDS_LINKS = ['html','json','img',]
     for rowd in ddrobjects[:5]:
+        # remove extraneous fields
         for fieldname in [f for f in rowd.keys()]:
             if fieldname not in ALLOW_FIELDS_OBJECTS:
                 rowd.pop(fieldname)
         for fieldname in [f for f in rowd['links'].keys()]:
             if fieldname not in ALLOW_FIELDS_LINKS:
                 rowd['links'].pop(fieldname)
+        # make sure URLs point to the running server
+        for key in rowd['links'].keys():
+            # for whatever reason some of the URLs coming from
+            a,b,path,params,query,fragment = urlparse(rowd['links'][key])
+            scheme = request.META.get('wsgi.url_scheme')
+            netloc = request.META.get('HTTP_HOST')
+            rowd['links'][key] = urlunparse([
+                scheme,netloc,path,params,query,fragment
+            ])
         api_out['objects'].append(rowd)
     return ddr_status,api_out
 
